@@ -144,6 +144,7 @@
             <div class="border-b border-cchc-red inline-block mb-10">
                 <h2 class="text-2xl font-bold text-cchc-blue pb-2">Informes y Documentos</h2>
             </div>
+            <!-- Los informes mantienen su diseño de 3 columnas -->
             <div id="grid-informes" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             <div id="empty-informes" class="hidden text-center py-16 text-gray-400">
                 <i class="fas fa-folder-open text-5xl mb-4 text-gray-300"></i>
@@ -155,7 +156,8 @@
             <div class="border-b border-cchc-red inline-block mb-10">
                 <h2 class="text-2xl font-bold text-cchc-blue pb-2">Visualizadores Interactivos</h2>
             </div>
-            <div id="grid-visualizadores" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            <!-- Cambiamos a 1 sola columna (flex-col) para los iframes -->
+            <div id="grid-visualizadores" class="flex flex-col gap-8"></div>
             <div id="empty-visualizadores" class="hidden text-center py-16 text-gray-400">
                 <i class="fas fa-folder-open text-5xl mb-4 text-gray-300"></i>
                 <p class="text-gray-500">No hay visualizadores registrados aún.</p>
@@ -166,7 +168,8 @@
             <div class="border-b border-cchc-red inline-block mb-10">
                 <h2 class="text-2xl font-bold text-cchc-blue pb-2">Indicadores Económicos</h2>
             </div>
-            <div id="grid-indicadores-economicos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            <!-- Cambiamos a 1 sola columna (flex-col) para los iframes -->
+            <div id="grid-indicadores-economicos" class="flex flex-col gap-8"></div>
             <div id="empty-indicadores-economicos" class="hidden text-center py-16 text-gray-400">
                 <i class="fas fa-folder-open text-5xl mb-4 text-gray-300"></i>
                 <p class="text-gray-500">No hay indicadores registrados aún.</p>
@@ -322,7 +325,7 @@
         }
 
         function construirTarjetas(datos) {
-            // IDs de los grids según la normalización (ej: "Indicadores Economicos" -> "indicadores-economicos")
+            // IDs de los grids según la normalización
             const contenedores = {
                 'informes': document.getElementById('grid-informes'),
                 'visualizadores': document.getElementById('grid-visualizadores'),
@@ -337,10 +340,10 @@
             document.getElementById('empty-visualizadores').classList.add('hidden');
             document.getElementById('empty-indicadores-economicos').classList.add('hidden');
 
-            datos.forEach(fila => {
+            datos.forEach((fila, index) => {
                 let valPestana = "", valNombre = "Sin Título", valDetalle = "", valActualizacion = "", valEnlace = "#";
                 
-                // Extraer valores ignorando el formato exacto de los encabezados (mayúsculas, tildes)
+                // Extraer valores ignorando el formato exacto de los encabezados
                 Object.keys(fila).forEach(key => {
                     const kNorm = normalizarTexto(key).replace(/-/g, '');
                     const val = fila[key] ? String(fila[key]).trim() : "";
@@ -355,46 +358,90 @@
                 const pestanaNorm = normalizarTexto(valPestana);
                 if (!pestanaNorm || !contenedores[pestanaNorm]) return;
 
-                // Estilos por tipo
-                let icono = "fa-file-pdf";
-                let colorIcono = "text-cchc-red";
-                let bgIcono = "bg-red-50";
-                let btnTexto = "Descargar PDF";
-                let btnColor = "bg-cchc-blue hover:bg-blue-800 border-cchc-blue";
-                let btnIcono = "fa-download";
-
-                if (pestanaNorm === 'visualizadores') { 
-                    icono = "fa-chart-pie"; colorIcono = "text-cchc-blue"; bgIcono = "bg-blue-50";
-                    btnTexto = "Ver Visualizador"; btnColor = "bg-white text-cchc-blue border-gray-300 hover:bg-blue-50"; btnIcono = "fa-external-link-alt";
-                } else if (pestanaNorm === 'indicadores-economicos') { 
-                    icono = "fa-chart-line"; colorIcono = "text-green-600"; bgIcono = "bg-green-50";
-                    btnTexto = "Ver Indicador"; btnColor = "bg-white text-green-700 border-gray-300 hover:bg-green-50"; btnIcono = "fa-arrow-right";
-                }
-
-                // Validar enlace
+                // Variables base
                 const esVacio = (!valEnlace || valEnlace === "#" || valEnlace === "-");
                 const targetHref = esVacio ? "javascript:void(0)" : valEnlace;
                 const targetAttr = esVacio ? "" : 'target="_blank"';
-                const opacityClass = esVacio ? "opacity-60 cursor-not-allowed" : "";
-                const btnExtraClass = pestanaNorm === 'informes' && !esVacio ? "text-white" : "";
+                let tarjetaHTML = "";
 
-                const tarjetaHTML = `
-                    <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md hover:border-gray-300 transition-all flex flex-col h-full ${opacityClass}">
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="${bgIcono} p-3 rounded-full flex items-center justify-center w-12 h-12">
-                                <i class="fas ${icono} ${colorIcono} text-xl"></i>
+                if (pestanaNorm === 'informes') {
+                    // DISEÑO 1: TARJETAS PEQUEÑAS PARA INFORMES (PDFs)
+                    const opacityClass = esVacio ? "opacity-60 cursor-not-allowed" : "";
+                    const btnExtraClass = !esVacio ? "text-white" : "";
+                    
+                    tarjetaHTML = `
+                        <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md hover:border-gray-300 transition-all flex flex-col h-full ${opacityClass}">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="bg-red-50 p-3 rounded-full flex items-center justify-center w-12 h-12">
+                                    <i class="fas fa-file-pdf text-cchc-red text-xl"></i>
+                                </div>
+                                ${valActualizacion ? `<span class="bg-gray-100 text-gray-600 text-[11px] font-bold px-3 py-1 rounded border border-gray-200">${valActualizacion}</span>` : ''}
                             </div>
-                            ${valActualizacion ? `<span class="bg-gray-100 text-gray-600 text-[11px] font-bold px-3 py-1 rounded border border-gray-200">${valActualizacion}</span>` : ''}
+                            <h3 class="text-lg font-bold text-slate-800 mb-2 leading-tight">${valNombre}</h3>
+                            <p class="text-sm text-gray-600 mb-6 flex-grow">${valDetalle}</p>
+                            
+                            <a href="${targetHref}" ${targetAttr} class="w-full inline-flex items-center justify-center gap-2 border bg-cchc-blue hover:bg-blue-800 border-cchc-blue ${btnExtraClass} text-sm font-semibold py-2.5 px-4 rounded-lg transition-colors">
+                                ${esVacio ? 'Próximamente' : 'Descargar PDF'}
+                                <i class="fas ${esVacio ? 'fa-lock' : 'fa-download'} text-xs"></i>
+                            </a>
                         </div>
-                        <h3 class="text-lg font-bold text-slate-800 mb-2 leading-tight">${valNombre}</h3>
-                        <p class="text-sm text-gray-600 mb-6 flex-grow">${valDetalle}</p>
-                        
-                        <a href="${targetHref}" ${targetAttr} class="w-full inline-flex items-center justify-center gap-2 border ${btnColor} ${btnExtraClass} text-sm font-semibold py-2.5 px-4 rounded-lg transition-colors">
-                            ${esVacio ? 'Próximamente' : btnTexto}
-                            <i class="fas ${esVacio ? 'fa-lock' : btnIcono} text-xs"></i>
-                        </a>
-                    </div>
-                `;
+                    `;
+                } else {
+                    // DISEÑO 2: ESTRUCTURA INTERACTIVA PARA VISUALIZADORES E INDICADORES
+                    let icono = pestanaNorm === 'visualizadores' ? "fa-chart-pie" : "fa-chart-line";
+                    let colorIcono = pestanaNorm === 'visualizadores' ? "text-cchc-blue" : "text-green-600";
+                    let bgIcono = pestanaNorm === 'visualizadores' ? "bg-blue-50" : "bg-green-50";
+
+                    tarjetaHTML = `
+                        <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-all w-full relative">
+                            <!-- Cabecera -->
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                                <div class="flex items-center gap-4">
+                                    <div class="${bgIcono} p-3 rounded-full flex items-center justify-center w-12 h-12">
+                                        <i class="fas ${icono} ${colorIcono} text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-xl font-bold text-slate-800 leading-tight">${valNombre}</h3>
+                                        ${valActualizacion ? `<span class="inline-block mt-1 bg-gray-100 text-gray-600 text-[11px] font-bold px-3 py-0.5 rounded border border-gray-200">${valActualizacion}</span>` : ''}
+                                    </div>
+                                </div>
+                                <button id="unload-vis-${index}" class="btn-unload-visualizer hidden items-center bg-gray-100 text-gray-600 border border-gray-300 px-4 py-2 text-sm font-bold rounded-lg hover:bg-red-50 hover:text-red-600 transition-colors" data-target-container="container-vis-${index}" data-target-fallback="fallback-vis-${index}">
+                                    <i class="fas fa-times-circle mr-2 text-red-500"></i> Cerrar visor
+                                </button>
+                            </div>
+
+                            <!-- Estado de reposo (Fallback) -->
+                            <div id="fallback-vis-${index}" class="flex flex-col items-center justify-center py-12 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg text-center">
+                                <i class="fas ${icono} text-4xl text-gray-300 mb-4"></i>
+                                <p class="text-gray-600 mb-6 max-w-2xl px-4">${valDetalle || "Haz clic abajo para iniciar el panel interactivo."}</p>
+                                
+                                <div class="flex flex-wrap gap-4 justify-center">
+                                    ${!esVacio ? `
+                                    <button data-target-container="container-vis-${index}" data-target-fallback="fallback-vis-${index}" data-unload-btn="unload-vis-${index}" data-url="${valEnlace}" class="btn-load-visualizer flex items-center gap-2 bg-cchc-blue text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-blue-800 transition-colors shadow-sm">
+                                        <i class="fas fa-play text-sm"></i> Cargar aquí
+                                    </button>
+                                    <a href="${valEnlace}" target="_blank" class="flex items-center gap-2 bg-white text-slate-700 border border-gray-300 px-6 py-2.5 rounded-lg font-semibold hover:bg-gray-100 transition-colors shadow-sm">
+                                        <i class="fas fa-external-link-alt text-sm"></i> Abrir en nueva pestaña
+                                    </a>
+                                    ` : `
+                                    <button disabled class="flex items-center gap-2 bg-gray-200 text-gray-500 px-6 py-2.5 rounded-lg font-semibold cursor-not-allowed border border-gray-300">
+                                        <i class="fas fa-lock text-sm"></i> Próximamente
+                                    </button>
+                                    `}
+                                </div>
+                            </div>
+
+                            <!-- Contenedor del Iframe (Oculto) -->
+                            <div id="container-vis-${index}" class="hidden relative w-full h-[700px] border border-gray-200 rounded-lg overflow-hidden">
+                                <div id="loader-vis-${index}" class="absolute inset-0 flex flex-col justify-center items-center bg-gray-50 z-10">
+                                    <div class="spinner mb-4"></div>
+                                    <span class="text-gray-500 text-sm font-semibold">Cargando interactivo...</span>
+                                </div>
+                                <iframe src="about:blank" data-loader="loader-vis-${index}" class="relative z-20 w-full h-full border-none" title="${valNombre}"></iframe>
+                            </div>
+                        </div>
+                    `;
+                }
 
                 contenedores[pestanaNorm].innerHTML += tarjetaHTML;
                 contadores[pestanaNorm]++;
@@ -405,6 +452,88 @@
             if(contadores['visualizadores'] === 0) document.getElementById('empty-visualizadores').classList.remove('hidden');
             if(contadores['indicadores-economicos'] === 0) document.getElementById('empty-indicadores-economicos').classList.remove('hidden');
         }
+
+        // =========================================================================
+        // LÓGICA DE INTERACCIÓN (Cargar / Cerrar Iframes)
+        // =========================================================================
+        document.body.addEventListener('click', function(e) {
+            // Acción: Botón "Cargar aquí"
+            const loadBtn = e.target.closest('.btn-load-visualizer');
+            if (loadBtn) {
+                e.preventDefault();
+                const targetContainerId = loadBtn.getAttribute('data-target-container');
+                const targetFallbackId = loadBtn.getAttribute('data-target-fallback');
+                const unloadBtnId = loadBtn.getAttribute('data-unload-btn');
+                const url = loadBtn.getAttribute('data-url');
+
+                const fallbackElement = document.getElementById(targetFallbackId);
+                const iframeContainer = document.getElementById(targetContainerId);
+                const unloadBtnElement = document.getElementById(unloadBtnId);
+
+                // Ocultar recuadro de texto y botones
+                if (fallbackElement) fallbackElement.style.display = 'none';
+                
+                // Mostrar botón de "Cerrar Visor"
+                if (unloadBtnElement) {
+                    unloadBtnElement.classList.remove('hidden');
+                    unloadBtnElement.classList.add('inline-flex');
+                }
+                
+                // Mostrar y cargar Iframe
+                if (iframeContainer) {
+                    iframeContainer.classList.remove('hidden');
+                    iframeContainer.classList.add('block');
+                    
+                    const iframe = iframeContainer.querySelector('iframe');
+                    if (iframe && (iframe.src === 'about:blank' || iframe.src === window.location.href)) {
+                        iframe.src = url;
+                        // Apagar loader cuando cargue
+                        iframe.addEventListener('load', function() {
+                            const loaderId = iframe.getAttribute('data-loader');
+                            if (loaderId) {
+                                const loader = document.getElementById(loaderId);
+                                if (loader) loader.style.display = 'none';
+                            }
+                        });
+                    }
+                }
+            }
+
+            // Acción: Botón "Cerrar Visor"
+            const unloadBtn = e.target.closest('.btn-unload-visualizer');
+            if (unloadBtn) {
+                e.preventDefault();
+                const targetContainerId = unloadBtn.getAttribute('data-target-container');
+                const targetFallbackId = unloadBtn.getAttribute('data-target-fallback');
+
+                const fallbackElement = document.getElementById(targetFallbackId);
+                const iframeContainer = document.getElementById(targetContainerId);
+
+                // Restaurar recuadro de texto original
+                if (fallbackElement) fallbackElement.style.display = 'flex'; 
+                
+                // Ocultar y vaciar Iframe para ahorrar memoria
+                if (iframeContainer) {
+                    iframeContainer.classList.remove('block');
+                    iframeContainer.classList.add('hidden');
+                    
+                    const iframe = iframeContainer.querySelector('iframe');
+                    if (iframe) {
+                        iframe.src = 'about:blank'; 
+                        // Restaurar estado del loader por si lo abren de nuevo
+                        const loaderId = iframe.getAttribute('data-loader');
+                        if (loaderId) {
+                            const loader = document.getElementById(loaderId);
+                            if (loader) loader.style.display = 'flex'; 
+                        }
+                    }
+                }
+                
+                // Ocultar botón de Cerrar
+                unloadBtn.classList.remove('inline-flex');
+                unloadBtn.classList.add('hidden');
+            }
+        });
     </script>
 </body>
 </html>
