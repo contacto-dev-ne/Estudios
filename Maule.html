@@ -261,42 +261,18 @@
         }
 
         // =========================================================================
-        // SOLUCIÓN DEFINITIVA PARA LOCAL (file:///) USANDO CORS PROXY Y JSON NATIVO
+        // LÓGICA DE PRODUCCIÓN (GITHUB PAGES) - SIN PROXY Y SIN PAPAPARSE
         // =========================================================================
         
-        async function cargarDatosGoogleSheets() {
-            document.getElementById('loader-container').classList.remove('hidden');
-            document.getElementById('loader-container').classList.add('flex');
-            document.getElementById('error-container').classList.add('hidden');
+        // Esta es la función que Google ejecutará automáticamente al descargar los datos
+        window.procesarDatosCChC = function(respuesta) {
+            if (respuesta.status === 'error') {
+                mostrarError("Error de Google: " + (respuesta.errors[0] ? respuesta.errors[0].message : "Error desconocido."));
+                return;
+            }
             
-            // 1. URL de exportación JSON de Google Sheets (gviz) en lugar de CSV
-            const JSON_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
-            
-            // 2. Usamos el Proxy gratuito (AllOrigins) para evadir la estricta seguridad 'file:///'
-            const PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(JSON_URL)}`;
-
             try {
-                // Hacemos la petición a través del puente
-                const response = await fetch(PROXY_URL);
-                if (!response.ok) throw new Error("No se pudo conectar con el servidor proxy.");
-                
-                const textData = await response.text();
-                
-                // Si la respuesta es una página web (HTML), significa que Google está pidiendo login
-                if(textData.trim().toLowerCase().startsWith("<!doctype html>")) {
-                    throw new Error("El documento de Google Sheets no es público. Revisa los permisos de enlace.");
-                }
-
-                // Google gviz devuelve el JSON envuelto en una función: /*O_o*/ google.visualization.Query.setResponse({ ... })
-                // Extraemos solo la parte del JSON válido
-                const jsonString = textData.substring(textData.indexOf('{'), textData.lastIndexOf('}') + 1);
-                const respuesta = JSON.parse(jsonString);
-
-                if (respuesta.status === 'error') {
-                    throw new Error("Error en la hoja: " + (respuesta.errors[0] ? respuesta.errors[0].message : "Desconocido"));
-                }
-
-                // Transformamos el formato nativo de Google Sheets a un Array normal de objetos (Sin necesidad de PapaParse)
+                // Transformamos el formato nativo de Google Sheets a una lista de objetos limpia
                 const columnas = respuesta.table.cols.map(c => c.label);
                 const datosExtraidos = respuesta.table.rows.map(fila => {
                     let obj = {};
@@ -316,9 +292,23 @@
                 datosDescargados = true;
 
             } catch (error) {
-                console.error("Fallo de conexión:", error);
-                mostrarError(error.message);
+                console.error("Error procesando los datos:", error);
+                mostrarError("Ocurrió un error al organizar la información del Excel.");
             }
+        };
+
+        function cargarDatosGoogleSheets() {
+            document.getElementById('loader-container').classList.remove('hidden');
+            document.getElementById('loader-container').classList.add('flex');
+            document.getElementById('error-container').classList.add('hidden');
+            
+            // Creamos un script que invoca la respuesta JSONP directa desde Google
+            // Al usar 'responseHandler', Google nos devuelve los datos listos para usar, evadiendo el CORS por completo.
+            const script = document.createElement('script');
+            script.src = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json;responseHandler:procesarDatosCChC&sheet=${SHEET_NAME}`;
+            
+            script.onerror = () => mostrarError("Fallo de red. Comprueba tu conexión a internet.");
+            document.body.appendChild(script);
         }
 
         function construirTarjetas(datos) {
