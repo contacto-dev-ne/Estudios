@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cámara Chilena de la Construcción Sede Maule - Inteligencia de Datos</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+          theme: {
+              extend: {
+                  fontFamily: { sans: ['Inter', 'sans-serif', 'Helvetica Neue', 'Arial'] },
+                  colors: { 
+                      cchc: { 
+                          blue: '#002B5C', 
+                          red: '#E31837', 
+                          gray: '#F3F4F6',
+                          light: '#dbeafe'
+                      } 
+                  }
+              }
+          }
+      }
+    </script>
+    
+    <!-- FontAwesome (Íconos) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        /* Ajustes básicos */
+        body { background-color: #F3F4F6; min-height: 100vh; display: flex; flex-direction: column; margin: 0; }
+        
+        /* Scrollbar personalizado */
+        ::-webkit-scrollbar { height: 6px; width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* Animaciones */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .spinner { border: 4px solid rgba(0, 43, 92, 0.1); width: 50px; height: 50px; border-radius: 50%; border-left-color: #E31837; animation: spin 1s linear infinite; }
+
+        /* Pestañas estilo CChC (IDÉNTICO A LA CAPTURA) */
+        .cchc-nav-tabs {
+            display: flex; flex-wrap: wrap; border-bottom: 1px solid #e5e7eb; margin-bottom: 0; padding-left: 0; list-style: none; gap: 5px;
+        }
+        .cchc-tab-link {
+            display: block; padding: 12px 16px; color: #6b7280; font-weight: 700; font-size: 15px; text-decoration: none;
+            border-bottom: 3px solid transparent; transition: all 0.2s; cursor: pointer; margin-bottom: -1px;
+        }
+        .cchc-tab-link:hover { color: #002B5C; }
+        .cchc-tab-link.active { color: #002B5C; border-bottom-color: #E31837; }
+        
+        @media (max-width: 640px) {
+            .cchc-nav-tabs { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 0px; }
+            .cchc-tab-link { white-space: nowrap; padding: 10px 12px; font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========================================== -->
+    <!-- HEADER (Diseño exacto de tu imagen)        -->
+    <!-- ========================================== -->
+    <header class="bg-white w-full pt-6 pb-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
+            <div class="flex items-center gap-4">
+                <img src="https://cchc.cl/documents/431409/0/logoCChC.png/002fea99-2039-beec-02a7-a92335532d6f?t=1695346405910" 
+                     alt="Logo Cámara Chilena de la Construcción" 
+                     class="h-12 w-auto object-contain">
+                <div class="border-l-2 border-gray-200 pl-4">
+                    <span class="block text-[15px] text-cchc-blue font-bold uppercase leading-tight">Unidad de estudios</span>
+                    <span class="block text-[15px] text-cchc-blue font-bold uppercase leading-tight">Maule</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <ul class="cchc-nav-tabs">
+                <li><a onclick="mostrarSeccion('inicio', this)" class="cchc-tab-link active">Inicio</a></li>
+                <li><a onclick="mostrarSeccion('informes', this)" class="cchc-tab-link">Informes</a></li>
+                <li><a onclick="mostrarSeccion('visualizadores', this)" class="cchc-tab-link">Visualizadores</a></li>
+                <li><a onclick="mostrarSeccion('indicadores-economicos', this)" class="cchc-tab-link">Indicadores Económicos</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- ========================================== -->
+    <!-- MAIN CONTENT                               -->
+    <!-- ========================================== -->
+    <main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        
+        <!-- SECCIÓN: INICIO -->
+        <div id="sec-inicio" class="seccion-contenido fade-in block">
+            <div class="bg-cchc-blue text-white rounded-lg p-10 text-center shadow-md mb-8">
+                <h1 class="text-3xl sm:text-4xl font-bold mb-4">Cámara Chilena de la Construcción Sede Maule</h1>
+                <p class="text-lg text-blue-100 max-w-3xl mx-auto">Bienvenido a la plataforma de información e inteligencia de datos de la Cámara Chilena de la Construcción, Sede Maule.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Accesos Rápidos -->
+                <div onclick="document.querySelectorAll('.cchc-tab-link')[1].click()" class="bg-white rounded-xl p-8 text-center border border-gray-200 shadow-sm hover:shadow-md hover:border-cchc-red cursor-pointer transition-all flex flex-col items-center">
+                    <div class="flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 text-cchc-blue text-2xl mb-4"><i class="fas fa-file-pdf"></i></div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-3">Informes Sectoriales</h3>
+                    <p class="text-gray-500 text-sm">Accede a nuestros últimos documentos y reportes en formato PDF.</p>
+                </div>
+                <div onclick="document.querySelectorAll('.cchc-tab-link')[2].click()" class="bg-white rounded-xl p-8 text-center border border-gray-200 shadow-sm hover:shadow-md hover:border-cchc-red cursor-pointer transition-all flex flex-col items-center">
+                    <div class="flex items-center justify-center w-16 h-16 rounded-full bg-red-50 text-cchc-red text-2xl mb-4"><i class="fas fa-chart-pie"></i></div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-3">Visualizadores</h3>
+                    <p class="text-gray-500 text-sm">Explora datos interactivos de vivienda y edificación en el Maule.</p>
+                </div>
+                <div onclick="document.querySelectorAll('.cchc-tab-link')[3].click()" class="bg-white rounded-xl p-8 text-center border border-gray-200 shadow-sm hover:shadow-md hover:border-cchc-red cursor-pointer transition-all flex flex-col items-center">
+                    <div class="flex items-center justify-center w-16 h-16 rounded-full bg-green-50 text-green-600 text-2xl mb-4"><i class="fas fa-chart-line"></i></div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-3">Indicadores</h3>
+                    <p class="text-gray-500 text-sm">Revisa la evolución de las principales variables económicas de la región.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ESTADO DE CARGA Y ERRORES -->
+        <div id="loader-container" class="hidden flex-col items-center justify-center py-20 fade-in">
+            <div class="spinner mb-6"></div>
+            <p class="text-cchc-blue font-bold text-lg">Conectando con la base de datos...</p>
+            <p class="text-gray-500 text-sm mt-2">Obteniendo estudios e indicadores actualizados.</p>
+        </div>
+        
+        <div id="error-container" class="hidden fade-in bg-red-50 border-l-4 border-red-500 p-6 rounded-r-lg shadow-sm mb-8 text-center sm:text-left">
+            <div class="flex flex-col sm:flex-row items-center sm:items-start">
+                <i class="fas fa-exclamation-triangle text-red-500 text-2xl mb-3 sm:mb-0 sm:mt-1 sm:mr-4"></i>
+                <div>
+                    <h3 class="text-red-800 font-bold text-lg mb-1">Error de Conexión</h3>
+                    <p id="error-msg" class="text-red-600 text-sm"></p>
+                    <button onclick="cargarDatosGoogleSheets()" class="mt-4 px-4 py-2 bg-white border border-red-200 text-red-600 font-semibold rounded hover:bg-red-50 transition-colors text-sm">Reintentar Conexión</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTENEDORES DINÁMICOS (Diseño idéntico a captura) -->
+        <div id="sec-informes" class="seccion-contenido hidden fade-in">
+            <div class="border-b border-cchc-red inline-block mb-10">
+                <h2 class="text-2xl font-bold text-cchc-blue pb-2">Informes y Documentos</h2>
+            </div>
+            <div id="grid-informes" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            <div id="empty-informes" class="hidden text-center py-16 text-gray-400">
+                <i class="fas fa-folder-open text-5xl mb-4 text-gray-300"></i>
+                <p class="text-gray-500">No hay informes registrados aún.</p>
+            </div>
+        </div>
+        
+        <div id="sec-visualizadores" class="seccion-contenido hidden fade-in">
+            <div class="border-b border-cchc-red inline-block mb-10">
+                <h2 class="text-2xl font-bold text-cchc-blue pb-2">Visualizadores Interactivos</h2>
+            </div>
+            <div id="grid-visualizadores" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            <div id="empty-visualizadores" class="hidden text-center py-16 text-gray-400">
+                <i class="fas fa-folder-open text-5xl mb-4 text-gray-300"></i>
+                <p class="text-gray-500">No hay visualizadores registrados aún.</p>
+            </div>
+        </div>
+        
+        <div id="sec-indicadores-economicos" class="seccion-contenido hidden fade-in">
+            <div class="border-b border-cchc-red inline-block mb-10">
+                <h2 class="text-2xl font-bold text-cchc-blue pb-2">Indicadores Económicos</h2>
+            </div>
+            <div id="grid-indicadores-economicos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            <div id="empty-indicadores-economicos" class="hidden text-center py-16 text-gray-400">
+                <i class="fas fa-folder-open text-5xl mb-4 text-gray-300"></i>
+                <p class="text-gray-500">No hay indicadores registrados aún.</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ========================================== -->
+    <!-- FOOTER (Diseño exacto de tu imagen)        -->
+    <!-- ========================================== -->
+    <footer class="bg-cchc-blue text-white py-12 mt-auto w-full">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-start">
+                
+                <!-- Logo e Info Sede -->
+                <div class="mb-8 md:mb-0">
+                    <img src="https://cchc.cl/documents/431409/0/logoCChC.png/002fea99-2039-beec-02a7-a92335532d6f?t=1695346405910" 
+                         alt="Logo CChC" 
+                         class="h-12 bg-white p-2 rounded mb-6 object-contain">
+                    <p class="text-blue-100 text-[13px] leading-relaxed">
+                        Cámara Chilena de la Construcción.<br>
+                        Unidad de Estudios. Sede Maule.
+                    </p>
+                </div>
+                
+                <!-- Redes Sociales -->
+                <div class="text-left md:text-right w-full md:w-auto">
+                    <h4 class="text-lg font-bold text-white mb-4">Síguenos</h4>
+                    <div class="flex gap-4 justify-start md:justify-end border-t border-blue-800 pt-4 w-full md:w-48">
+                        <a href="https://www.instagram.com/cchcmaule" target="_blank" class="flex items-center justify-center w-9 h-9 rounded-full bg-[#1e40af] text-white hover:bg-cchc-red transition-colors" aria-label="Instagram">
+                            <i class="fab fa-instagram text-lg"></i>
+                        </a>
+                        <a href="https://www.facebook.com/share/1AkxVFf1Yk/" target="_blank" class="flex items-center justify-center w-9 h-9 rounded-full bg-[#1e40af] text-white hover:bg-cchc-red transition-colors" aria-label="Facebook">
+                            <i class="fab fa-facebook-f text-lg"></i>
+                        </a>
+                        <a href="https://x.com/CChCTalca" target="_blank" class="flex items-center justify-center w-9 h-9 rounded-full bg-[#1e40af] text-white hover:bg-cchc-red transition-colors" aria-label="X (Twitter)">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-4 h-4 fill-current"><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/></svg>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </footer>
+
+    <!-- ========================================== -->
+    <!-- LÓGICA Y CONEXIÓN BASE DE DATOS (JSONP)    -->
+    <!-- ========================================== -->
+    <script>
+        const SHEET_ID = '1RIM_at7iF0uLRninh0Tc_2ylblPlZAxnTWIZMrff-vo';
+        const SHEET_NAME = 'estudios';
+
+        let datosDescargados = false;
+
+        // Normaliza texto para que no importen las mayúsculas, tildes o espacios
+        function normalizarTexto(texto) {
+            if(!texto) return "";
+            return texto.toString().trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '-');
+        }
+
+        // Navegación de pestañas
+        function mostrarSeccion(seccionId, elementoClick) {
+            document.querySelectorAll('.seccion-contenido').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('block');
+            });
+            document.querySelectorAll('.cchc-tab-link').forEach(link => {
+                link.classList.remove('active');
+            });
+
+            const secDestino = document.getElementById('sec-' + seccionId);
+            if(secDestino) {
+                secDestino.classList.remove('hidden');
+                secDestino.classList.add('block');
+            }
+            if(elementoClick) {
+                elementoClick.classList.add('active');
+            }
+
+            // Descargar datos la primera vez que se sale de "Inicio"
+            if (seccionId !== 'inicio' && !datosDescargados) {
+                cargarDatosGoogleSheets();
+            }
+        }
+
+        function mostrarError(mensaje) {
+            document.getElementById('loader-container').classList.add('hidden');
+            document.getElementById('loader-container').classList.remove('flex');
+            document.getElementById('error-container').classList.remove('hidden');
+            document.getElementById('error-msg').innerText = mensaje;
+        }
+
+        // =========================================================================
+        // SOLUCIÓN DEFINITIVA PARA LOCAL (file:///) USANDO CORS PROXY Y JSON NATIVO
+        // =========================================================================
+        
+        async function cargarDatosGoogleSheets() {
+            document.getElementById('loader-container').classList.remove('hidden');
+            document.getElementById('loader-container').classList.add('flex');
+            document.getElementById('error-container').classList.add('hidden');
+            
+            // 1. URL de exportación JSON de Google Sheets (gviz) en lugar de CSV
+            const JSON_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
+            
+            // 2. Usamos el Proxy gratuito (AllOrigins) para evadir la estricta seguridad 'file:///'
+            const PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(JSON_URL)}`;
+
+            try {
+                // Hacemos la petición a través del puente
+                const response = await fetch(PROXY_URL);
+                if (!response.ok) throw new Error("No se pudo conectar con el servidor proxy.");
+                
+                const textData = await response.text();
+                
+                // Si la respuesta es una página web (HTML), significa que Google está pidiendo login
+                if(textData.trim().toLowerCase().startsWith("<!doctype html>")) {
+                    throw new Error("El documento de Google Sheets no es público. Revisa los permisos de enlace.");
+                }
+
+                // Google gviz devuelve el JSON envuelto en una función: /*O_o*/ google.visualization.Query.setResponse({ ... })
+                // Extraemos solo la parte del JSON válido
+                const jsonString = textData.substring(textData.indexOf('{'), textData.lastIndexOf('}') + 1);
+                const respuesta = JSON.parse(jsonString);
+
+                if (respuesta.status === 'error') {
+                    throw new Error("Error en la hoja: " + (respuesta.errors[0] ? respuesta.errors[0].message : "Desconocido"));
+                }
+
+                // Transformamos el formato nativo de Google Sheets a un Array normal de objetos (Sin necesidad de PapaParse)
+                const columnas = respuesta.table.cols.map(c => c.label);
+                const datosExtraidos = respuesta.table.rows.map(fila => {
+                    let obj = {};
+                    columnas.forEach((colNombre, index) => {
+                        if (colNombre) {
+                            // Intenta obtener el texto formateado (.f) o el valor base (.v)
+                            obj[colNombre] = fila.c[index] ? (fila.c[index].f || fila.c[index].v || "") : "";
+                        }
+                    });
+                    return obj;
+                });
+
+                document.getElementById('loader-container').classList.add('hidden');
+                document.getElementById('loader-container').classList.remove('flex');
+                
+                construirTarjetas(datosExtraidos);
+                datosDescargados = true;
+
+            } catch (error) {
+                console.error("Fallo de conexión:", error);
+                mostrarError(error.message);
+            }
+        }
+
+        function construirTarjetas(datos) {
+            // IDs de los grids según la normalización (ej: "Indicadores Economicos" -> "indicadores-economicos")
+            const contenedores = {
+                'informes': document.getElementById('grid-informes'),
+                'visualizadores': document.getElementById('grid-visualizadores'),
+                'indicadores-economicos': document.getElementById('grid-indicadores-economicos')
+            };
+
+            const contadores = { 'informes': 0, 'visualizadores': 0, 'indicadores-economicos': 0 };
+
+            // Limpiamos los grids
+            Object.values(contenedores).forEach(c => { if(c) c.innerHTML = ''; });
+
+            datos.forEach(fila => {
+                let valPestana = "", valNombre = "Sin Título", valDetalle = "", valActualizacion = "", valEnlace = "#";
+                
+                // Extraer valores ignorando el formato exacto de los encabezados (mayúsculas, tildes)
+                Object.keys(fila).forEach(key => {
+                    const kNorm = normalizarTexto(key).replace(/-/g, '');
+                    const val = fila[key] ? String(fila[key]).trim() : "";
+                    
+                    if(kNorm === "pestana") valPestana = val;
+                    if(kNorm === "nombre") valNombre = val || "Sin Título";
+                    if(kNorm === "detalle") valDetalle = val;
+                    if(kNorm === "actualizacion") valActualizacion = val;
+                    if(kNorm === "enlace") valEnlace = val || "#";
+                });
+
+                const pestanaNorm = normalizarTexto(valPestana);
+                if (!pestanaNorm || !contenedores[pestanaNorm]) return;
+
+                // Estilos por tipo
+                let icono = "fa-file-pdf";
+                let colorIcono = "text-cchc-red";
+                let bgIcono = "bg-red-50";
+                let btnTexto = "Descargar PDF";
+                let btnColor = "bg-cchc-blue hover:bg-blue-800 border-cchc-blue";
+                let btnIcono = "fa-download";
+
+                if (pestanaNorm === 'visualizadores') { 
+                    icono = "fa-chart-pie"; colorIcono = "text-cchc-blue"; bgIcono = "bg-blue-50";
+                    btnTexto = "Ver Visualizador"; btnColor = "bg-white text-cchc-blue border-gray-300 hover:bg-blue-50"; btnIcono = "fa-external-link-alt";
+                } else if (pestanaNorm === 'indicadores-economicos') { 
+                    icono = "fa-chart-line"; colorIcono = "text-green-600"; bgIcono = "bg-green-50";
+                    btnTexto = "Ver Indicador"; btnColor = "bg-white text-green-700 border-gray-300 hover:bg-green-50"; btnIcono = "fa-arrow-right";
+                }
+
+                // Validar enlace
+                const esVacio = (!valEnlace || valEnlace === "#" || valEnlace === "-");
+                const targetHref = esVacio ? "javascript:void(0)" : valEnlace;
+                const targetAttr = esVacio ? "" : 'target="_blank"';
+                const opacityClass = esVacio ? "opacity-60 cursor-not-allowed" : "";
+                const btnExtraClass = pestanaNorm === 'informes' && !esVacio ? "text-white" : "";
+
+                const tarjetaHTML = `
+                    <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md hover:border-gray-300 transition-all flex flex-col h-full ${opacityClass}">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="${bgIcono} p-3 rounded-full flex items-center justify-center w-12 h-12">
+                                <i class="fas ${icono} ${colorIcono} text-xl"></i>
+                            </div>
+                            ${valActualizacion ? `<span class="bg-gray-100 text-gray-600 text-[11px] font-bold px-3 py-1 rounded border border-gray-200">${valActualizacion}</span>` : ''}
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-800 mb-2 leading-tight">${valNombre}</h3>
+                        <p class="text-sm text-gray-600 mb-6 flex-grow">${valDetalle}</p>
+                        
+                        <a href="${targetHref}" ${targetAttr} class="w-full inline-flex items-center justify-center gap-2 border ${btnColor} ${btnExtraClass} text-sm font-semibold py-2.5 px-4 rounded-lg transition-colors">
+                            ${esVacio ? 'Próximamente' : btnTexto}
+                            <i class="fas ${esVacio ? 'fa-lock' : btnIcono} text-xs"></i>
+                        </a>
+                    </div>
+                `;
+
+                contenedores[pestanaNorm].innerHTML += tarjetaHTML;
+                contadores[pestanaNorm]++;
+            });
+
+            // Mostrar mensajes vacíos idénticos a la captura
+            if(contadores['informes'] === 0) document.getElementById('empty-informes').classList.remove('hidden');
+            if(contadores['visualizadores'] === 0) document.getElementById('empty-visualizadores').classList.remove('hidden');
+            if(contadores['indicadores-economicos'] === 0) document.getElementById('empty-indicadores-economicos').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
