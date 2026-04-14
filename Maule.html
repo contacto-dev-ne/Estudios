@@ -272,14 +272,24 @@
             }
             
             try {
-                // Transformamos el formato nativo de Google Sheets a una lista de objetos limpia
-                const columnas = respuesta.table.cols.map(c => c.label);
-                const datosExtraidos = respuesta.table.rows.map(fila => {
+                // Verificamos de forma inteligente si Google puso los encabezados en 'cols' o en la fila 0 de 'rows'
+                let columnas = respuesta.table.cols.map(c => c.label);
+                let filas = respuesta.table.rows;
+
+                // Si las columnas están vacías, significa que Google las interpretó como datos (fila 0)
+                if (columnas.every(c => !c)) {
+                    columnas = filas[0].c.map(celda => celda ? (celda.v || celda.f || "") : "");
+                    filas = filas.slice(1); // Descartamos la primera fila porque ya sabemos que son los títulos
+                }
+
+                // Extraemos los datos cruzando columnas y filas
+                const datosExtraidos = filas.map(fila => {
                     let obj = {};
                     columnas.forEach((colNombre, index) => {
-                        if (colNombre) {
-                            // Intenta obtener el texto formateado (.f) o el valor base (.v)
-                            obj[colNombre] = fila.c[index] ? (fila.c[index].f || fila.c[index].v || "") : "";
+                        if (colNombre && fila.c && fila.c[index]) {
+                            obj[colNombre] = fila.c[index].f || fila.c[index].v || "";
+                        } else if (colNombre) {
+                            obj[colNombre] = "";
                         }
                     });
                     return obj;
@@ -303,9 +313,9 @@
             document.getElementById('error-container').classList.add('hidden');
             
             // Creamos un script que invoca la respuesta JSONP directa desde Google
-            // Al usar 'responseHandler', Google nos devuelve los datos listos para usar, evadiendo el CORS por completo.
             const script = document.createElement('script');
-            script.src = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json;responseHandler:procesarDatosCChC&sheet=${SHEET_NAME}`;
+            // AGREGADO: &headers=1 para forzar a Google a enviar la primera fila correctamente
+            script.src = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json;responseHandler:procesarDatosCChC&sheet=${SHEET_NAME}&headers=1`;
             
             script.onerror = () => mostrarError("Fallo de red. Comprueba tu conexión a internet.");
             document.body.appendChild(script);
@@ -321,8 +331,11 @@
 
             const contadores = { 'informes': 0, 'visualizadores': 0, 'indicadores-economicos': 0 };
 
-            // Limpiamos los grids
+            // Limpiamos los grids y ocultamos los empty states
             Object.values(contenedores).forEach(c => { if(c) c.innerHTML = ''; });
+            document.getElementById('empty-informes').classList.add('hidden');
+            document.getElementById('empty-visualizadores').classList.add('hidden');
+            document.getElementById('empty-indicadores-economicos').classList.add('hidden');
 
             datos.forEach(fila => {
                 let valPestana = "", valNombre = "Sin Título", valDetalle = "", valActualizacion = "", valEnlace = "#";
